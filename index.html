@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ListingLift — Turn Stalled Listings Into Sales</title>
+<style>
+  :root {
+    --ink: #1c1a17;
+    --cream: #fdfbf7;
+    --sand: #f4ede2;
+    --coral: #ff6f4d;
+    --coral-dark: #e0552f;
+    --green: #2f6f5e;
+    --gold: #d9a441;
+    --muted: #6b6459;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .container {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* NAV */
+  header {
+    position: sticky;
+    top: 0;
+    background: rgba(253, 251, 247, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    border-bottom: 1px solid #eee2d3;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    max-width: 1150px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--coral); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--coral); }
+
+  .nav-cta {
+    background: var(--coral);
+    color: #fff !important;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .nav-cta:hover {
+    background: var(--coral-dark);
+    transform: translateY(-1px);
+  }
+
+  .mobile-toggle { display: none; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 100px 24px 90px;
+    background: linear-gradient(135deg, #fff8ef 0%, #f4ede2 60%, #ffe9de 100%);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,111,77,0.18), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -160px;
+    left: -100px;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(47,111,94,0.15), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-inner {
+    max-width: 1150px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #eddfc9;
+    padding: 7px 16px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--coral-dark);
+    margin-bottom: 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+
+  .hero h1 {
+    font-size: 3.1rem;
+    margin-bottom: 22px;
+    letter-spacing: -1px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--coral);
+    position: relative;
+  }
+
+  .hero p.sub {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 34px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 16px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.25s;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--coral);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(255,111,77,0.35);
+  }
+
+  .btn-primary:hover {
+    background: var(--coral-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(255,111,77,0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid #dfd3bd;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--ink);
+    background: #fff;
+  }
+
+  .hero-note {
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .hero-visual {
+    position: relative;
+  }
+
+  .card-mock {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+    padding: 26px;
+    border: 1px solid #f0e6d6;
+  }
+
+  .card-mock .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .score-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: conic-gradient(var(--coral) 0% 42%, #f1e7d6 42% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-family: Georgia, serif;
+    position: relative;
+  }
+
+  .score-circle::before {
+    content: "";
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .score-circle span { position: relative; z-index: 2; font-size: 1.1rem; }
+
+  .card-mock .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .card-mock .title { font-weight: 700; font-family: Georgia, serif; font-size: 1.05rem; margin-bottom: 4px; }
+
+  .bar-row { margin-bottom: 12px; }
+  .bar-row .bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--muted); }
+  .bar-track { height: 8px; background: #f1e7d6; border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--green); border-radius: 6px; }
+
+  .float-tag {
+    position: absolute;
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .float-tag.top { top: -18px; right: 10px; background: var(--gold); color: #2b2107; }
+  .float-tag.bottom { bottom: -18px; left: 10px; }
+
+  /* SECTION GENERAL */
+  section { padding: 90px 24px; }
+
+  .section-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 60px;
+  }
+
+  .kicker {
+    color: var(--coral-dark);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .section-head h2 {
+    font-size: 2.3rem;
+    margin-bottom: 14px;
+  }
+
+  .section-head p {
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .feature-card {
+    background: #fff;
+    border: 1px solid #f0e6d6;
+    border-radius: 16px;
+    padding: 34px 28px;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  }
+
+  .feature-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: #fff1ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  /* PROCESS / ABOUT */
+  .about {
+    background: var(--sand);
+  }
+
+  .about-inner {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .about-visual {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  }
+
+  .before-after {
+    display: flex;
+    gap: 14px;
+  }
+
+  .ba-col {
+    flex: 1;
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #eee2d3;
+  }
+
+  .ba-col h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    color: var(--muted);
+  }
+
+  .ba-line {
+    height: 10px;
+    background: #e9ddc7;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  .ba-col.after .ba-line { background: #cfe6dd; }
+  .ba-col.after h4 { color: var(--green); }
+
+  .about-text .kicker { margin-bottom: 12px; }
+
+  .about-text h2 {
+    font-size: 2.1rem;
+    margin-bottom: 20px;
+  }
+
+  .about-text p {
+    color: var(--muted);
+    margin-bottom: 18px;
+    font-size: 1.02rem;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+  }
+
+  .stat h3 {
+    font-size: 1.8rem;
+    color: var(--coral);
+    font-family: Georgia, serif;
+  }
+
+  .stat p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .disclaimer {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: #fff;
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+  }
+
+  /* PRICING */
+  .pricing {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .pricing .section-head h2 { color: #fff; }
+  .pricing .section-head p { color: #c9c3b8; }
+  .pricing .kicker { color: var(--gold); }
+
+  .free-strip {
+    max-width: 900px;
+    margin: 0 auto 50px;
+    background: linear-gradient(120deg, #2f6f5e, #234f42);
+    border-radius: 16px;
+    padding: 28px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .free-strip h3 { font-size: 1.3rem; margin-bottom: 6px; }
+  .free-strip p { color: #d7e8e2; font-size: 0.92rem; margin: 0; }
+
+  .pricing-grid {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+
+  .price-card {
+    background: #262420;
+    border: 1px solid #38352e;
+    border-radius: 16px;
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+
+  .price-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--coral);
+  }
+
+  .price-card.featured {
+    background: linear-gradient(160deg, #3a2a22, #2a231d);
+    border-color: var(--coral);
+    position: relative;
+  }
+
+  .price-tag {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: var(--coral);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .price-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    font-family: Georgia, serif;
+  }
+
+  .price-card .price {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    font-family: Georgia, serif;
+  }
+
+  .price-card .price span {
+    font-size: 0.95rem;
+    color: #a8a196;
+    font-weight: 400;
+  }
+
+  .price-card .price-desc {
+    font-size: 0.85rem;
+    color: #a8a196;
+    margin-bottom: 20px;
+  }
+
+  .price-card ul {
+    list-style: none;
+    margin-bottom: 24px;
+    flex-grow: 1;
+  }
+
+  .price-card ul li {
+    font-size: 0.88rem;
+    color: #d6d1c6;
+    margin-bottom: 10px;
+    padding-left: 22px;
+    position: relative;
+  }
+
+  .price-card ul li::before {
+    content: "✓";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  .price-card .btn {
+    text-align: center;
+  }
+
+  .price-card .btn-outline {
+    border: 2px solid #4a463d;
+    color: #fff;
+    background: transparent;
+  }
+
+  .price-card .btn-outline:hover {
+    border-color: var(--coral);
+    color: var(--coral);
+  }
+
+  .subscription-note {
+    max-width: 900px;
+    margin: 50px auto 0;
+    text-align: center;
+    color: #a8a196;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .subscription-note strong { color: #fff; }
+
+  /* CTA / CONTACT */
+  .cta-section {
+    background: linear-gradient(135deg, #ff8a6b, var(--coral) 40%, var(--coral-dark));
+    color: #fff;
+    text-align: center;
+    padding: 100px 24px;
+  }
+
+  .cta-section h2 {
+    font-size: 2.4rem;
+    margin-bottom: 16px;
+  }
+
+  .cta-section p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    max-width: 560px;
+    margin: 0 auto 34px;
+  }
+
+  .cta-form {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-form input {
+    flex: 1;
+    min-width: 220px;
+    padding: 15px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+  }
+
+  .cta-form button {
+    background: var(--ink);
+    color: #fff;
+    padding: 15px 26px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+  }
+
+  .cta-form button:hover { background: #000; }
+
+  .cta-trust {
+    margin-top: 18px;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #16140f;
+    color: #a8a196;
+    padding: 50px 24px 24px;
+  }
+
+  .footer-inner {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .footer-col h4 {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 14px;
+    font-family: Georgia, serif;
+  }
+
+  .footer-col a {
+    display: block;
+    color: #a8a196;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--coral); }
+
+  .footer-brand .logo { color: #fff; margin-bottom: 12px; }
+  .footer-brand p { font-size: 0.88rem; max-width: 260px; }
+
+  .footer-bottom {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid #2a2820;
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 980px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { order: -1; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-inner { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 2.2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .free-strip { flex-direction: column; text-align: center; }
+    .stat-row { flex-wrap: wrap; gap: 24px; }
+    section { padding: 60px 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <div class="logo">Listing<span>Lift</span></div>
+      <div class="nav-links">
+        <a href="#features">How It Works</a>
+        <a href="#about">Why ListingLift</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Get Started</a>
+      </div>
+      <a href="#contact" class="nav-cta">Get Free Scorecard</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="badge">🏆 Free Public Teardown Contest — Open Now</span>
+        <h1>Your listings are one <em>optimization</em> away from real momentum.</h1>
+        <p class="sub">ListingLift turns your Etsy or Amazon Handmade shop data, photos, and competitor examples into optimized titles, tags, pricing insights, and a prioritized test plan — delivered in 48 hours.</p>
+        <div class="hero-ctas">
+          <a href="#contact" class="btn btn-primary">Get My Free Scorecard →</a>
+          <a href="#pricing" class="btn btn-secondary">See Pricing</a>
+        </div>
+        <p class="hero-note">No guarantees, no hype — just structured, measurable improvement opportunities for sellers with 10–200 listings.</p>
+      </div>
+      <div class="hero-visual">
+        <span class="float-tag top">+ Shareable Teardown</span>
+        <div class="card-mock">
+          <div class="score-row">
+            <div>
+              <div class="label">Shop Score</div>
+              <div class="title">Woven Hollow Studio</div>
+            </div>
+            <div class="score-circle"><span>42/100</span></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Title Strength</span><span>Weak</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:35%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Tag Coverage</span><span>Needs Work</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:48%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Image Order</span><span>Fixable Today</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
+          </div>
+        </div>
+        <span class="float-tag bottom">48-Hour Delivery</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="section-head">
+      <span class="kicker">What You Get</span>
+      <h2>A complete listing growth system, not just tips</h2>
+      <p>Submit your shop once. Get a structured, prioritized plan built around what actually moves the needle for your specific listings.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Free ListingLift Scorecard</h3>
+        <p>A shareable before-and-after teardown that scores your shop and highlights the top opportunities — built to be posted and shared.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✍️</div>
+        <h3>Optimized Titles & Descriptions</h3>
+        <p>Rewritten copy based on keyword research and competitor benchmarking, designed to convert browsers into buyers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <h3>Tag & Keyword Mapping</h3>
+        <p>A full tag audit matched against target keywords and real competitor listings so nothing is left on the table.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖼️</div>
+        <h3>Image-Order Recommendations</h3>
+        <p>Simple, high-impact sequencing changes to your existing photos — no reshoots required to see a difference.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💲</div>
+        <h3>Pricing Insights</h3>
+        <p>A clear read on where your pricing sits versus comparable shops, plus test suggestions to find your ceiling.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧪</div>
+        <h3>Prioritized Test Plan</h3>
+        <p>A ranked, 48-hour-delivered roadmap of what to change first, second, and third — with measurable checkpoints.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-inner">
+      <div class="about-visual">
+        <div class="before-after">
+          <div class="ba-col">
+            <h4>Before</h4>
+            <div class="ba-line" style="width:90%"></div>
+            <div class="ba-line" style="width:70%"></div>
+            <div class="ba-line" style="width:80%"></div>
+            <div class="ba-line" style="width:55%"></div>
+          </div>
+          <div class="ba-col after">
+            <h4>After</h4>
+            <div class="ba-line" style="width:95%"></div>
+            <div class="ba-line" style="width:88%"></div>
+            <div class="ba-line" style="width:92%"></div>
+            <div class="ba-line" style="width:85%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="about-text">
+        <span class="kicker">Why Sellers Trust ListingLift</span>
+        <h2>Built for shops that are stalled, not starting from zero</h2>
+        <p>You already have listings, photos, and traffic history — you just need someone to look at it methodically. ListingLift was built specifically for independent Etsy and Amazon Handmade sellers running 10–200 listings who feel stuck, not sellers looking for a magic fix.</p>
+        <p>Every recommendation is grounded in your actual data, your competitors' actual listings, and your actual keywords — framed as tested improvement opportunities, never guaranteed rankings or sales.</p>
+        <div class="stat-row">
+          <div class="stat"><h3>48h</h3><p>Delivery window</p></div>
+          <div class="stat"><h3>10–200</h3><p>Listings we specialize in</p></div>
+          <div class="stat"><h3>Monthly</h3><p>Ongoing refresh cycle</p></div>
+        </div>
+        <div class="disclaimer">Results are positioned as improvement opportunities based on structured testing — not guaranteed rankings, traffic, or sales outcomes.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <div class="section-head">
+      <span class="kicker">Pricing & Offers</span>
+      <h2>Start free. Scale at your own pace.</h2>
+      <p>From a single listing audit to a full multi-listing growth system — plus monthly plans that keep your shop optimized year-round.</p>
+    </div>
+
+    <div class="free-strip">
+      <div>
+        <h3>🎁 Free ListingLift Scorecard</h3>
+        <p>Get a shareable, scored teardown of your shop with your top 3 opportunities — no cost, no obligation.</p>
+      </div>
+      <a href="#contact" class="btn btn-primary">Claim Free Scorecard</a>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h4>Single Listing Audit</h4>
+        <div class="price">$29</div>
+        <p class="price-desc">One listing, fully reviewed</p>
+        <ul>
+          <li>Title & tag review</li>
+          <li>Basic keyword check</li>
+          <li>Quick-win recommendations</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline">Order Audit</a>
+      </div>
+
+      <div class="price-card featured">
+        <span class="price-tag">Most Popular</span>
+        <h4>Optimized Listing Package</h4>
+        <div class="price">$79</div>
+        <p class="price-desc">One listing, fully rebuilt</p>
+        <ul>
+          <li>New title & description</li>
+          <li>Full tag mapping</li>
+          <li>Image order recommendation</li>
+          <li>Pricing insight snapshot</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary">Get Optimized</a>
+      </div>
+
+      <div class="price-card">
+        <h4>Growth Sprint</h4>
+        <div class="price">$199</div>
+        <p class="price-desc">5 listings, prioritized plan</p>
+        <ul>
+          <li>Everything in Optimized Package</li>
+          <li>Competitor benchmarking</li>
+          <li>Prioritized test plan</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline">Start Sprint</a>
+      </div>
+
+      <div class="price-card">
+        <h4>Conversion System</h4>
+        <div class="price">$399</div>
+        <p class="price-desc">10 listings, full system</p>
+        <ul>
+          <li>Everything in Growth Sprint</li>
+          <li>Full shop-level keyword map</li>
+          <li>Experiment tracking setup</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline">Build My System</a>
+      </div>
+    </div>
+
+    <div class="subscription-note">
+      <strong>Stay optimized year-round:</strong> Monthly refresh plans from <strong>$149–$499/mo</strong> include keyword monitoring, seasonal updates, experiment tracking, and coverage for new listings as your shop grows. Need it faster? Add <strong>$49 expedited delivery</strong> to any order. Agency & reseller plans and performance bonuses tied to agreed measurable deliverables are also available. Refer a fellow seller and get a free listing refresh or account credit.
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <h2>Ready to see what's holding your listings back?</h2>
+    <p>Submit your shop for a free ListingLift Scorecard — a scored, shareable teardown with your top opportunities, delivered in 48 hours.</p>
+    <form class="cta-form" onsubmit="return false;">
+      <input type="email" placeholder="Your email address" required>
+      <button type="submit">Get My Free Scorecard</button>
+    </form>
+    <p class="cta-trust">Etsy & Amazon Handmade sellers with 10–200 listings — no cost, no commitment, no guarantees oversold.</p>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-col footer-brand">
+        <div class="logo">Listing<span style="color:#ff6f4d;">Lift</span></div>
+        <p>A conversion-focused listing growth system for independent Etsy and Amazon Handmade sellers.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="#pricing">Single Listing Audit</a>
+        <a href="#pricing">Optimized Listing Package</a>
+        <a href="#pricing">Growth Sprint</a>
+        <a href="#pricing">Conversion System</a>
+        <a href="#pricing">Monthly Refresh Plans</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#about">Why ListingLift</a>
+        <a href="#features">How It Works</a>
+        <a href="#contact">Free Scorecard</a>
+        <a href="#contact">Referral Program</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <a href="#contact">Submit Your Shop</a>
+        <a href="#contact">Agency & Reseller Plans</a>
+        <a href="#contact">Contact Us</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 ListingLift. All rights reserved.</span>
+      <span>Improvement opportunities, not guaranteed rankings or sales.</span>
+    </div>
+  </footer>
+
+<script>(function(){var E='APP_BASE_URL/functions/siteChat',S='listinglift';var b=document.createElement('div');b.style.cssText='position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:#00ff41;color:#0a0a12;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 0 20px rgba(0,255,65,0.5);z-index:99999';b.innerHTML='\u{1F4AC}';document.body.appendChild(b);var p=document.createElement('div');p.style.cssText='position:fixed;bottom:90px;right:20px;width:320px;max-height:400px;background:#0a0a12;border:2px solid #00ff41;border-radius:12px;display:none;flex-direction:column;z-index:99999;overflow:hidden;font-family:sans-serif';p.innerHTML='<div style="padding:12px;background:#00ff41;color:#0a0a12;font-weight:bold;font-size:14px">Chat with us</div><div id="cm" style="flex:1;overflow-y:auto;padding:12px;max-height:280px"></div><div style="padding:8px;display:flex;gap:4px"><input id="ci" style="flex:1;padding:8px;border:1px solid #00ff41;border-radius:4px;background:#111;color:#fff" placeholder="Type a message..."/><button id="cs" style="padding:8px 12px;background:#00ff41;color:#0a0a12;border:none;border-radius:4px;cursor:pointer;font-weight:bold">Send</button></div>';document.body.appendChild(p);var m=p.querySelector('#cm');function a(t,w){var d=document.createElement('div');d.style.cssText='padding:6px 10px;margin:4px 0;border-radius:8px;max-width:85%;font-size:13px;color:#fff;'+(w==='bot'?'background:#1a3a1a':'background:#003a3a;margin-left:auto');d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;}b.onclick=function(){p.style.display=p.style.display==='none'?'flex':'none';if(!m.children.length)a('Hi! Ask me anything about our business.','bot');};function s(){var i=p.querySelector('#ci'),t=i.value.trim();if(!t)return;a(t,'user');i.value='';a('...','bot');fetch(E,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug:S,message:t})}).then(function(r){return r.json();}).then(function(d){var l=m.lastChild;if(l)l.remove();a(d.reply||'Sorry, I did not get that.','bot');}).catch(function(){var l=m.lastChild;if(l)l.remove();a('Connection error. Please try again later.','bot');});}p.querySelector('#cs').onclick=s;p.querySelector('#ci').onkeydown=function(e){if(e.key==='Enter')s();};})();</script></body>
+</html>
